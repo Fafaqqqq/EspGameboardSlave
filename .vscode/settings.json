@@ -1,0 +1,16 @@
+{
+  "files.associations": {
+    "sdkconfig.h": "c",
+    "spi_display.h": "c",
+    "*.tcc": "c",
+    "compare": "c",
+    "limits": "c",
+    "spi_driver_display.h": "c",
+    "nvs_flash.h": "c",
+    "err.h": "c",
+    "sockets.h": "c",
+    "netdb.h": "c"
+  },
+  "cmake.configureOnOpen": false,
+  "C_Cpp.errorSquiggles": "disabled"
+}
