@@ -28,6 +28,11 @@
 #define ESP_WIFI_SAE_MODE                 WPA3_SAE_PWE_BOTH
 #define ESP_WIFI_SCAN_AUTH_MODE_THRESHOLD WIFI_AUTH_WPA2_PSK
 
+typedef struct {
+  float x;
+  float y;
+} joystick_data_t;
+
 static EventGroupHandle_t s_wifi_event_group = NULL;
 
 static const char *TAG = "slave_target";
@@ -123,9 +128,12 @@ void wifi_init_sta(void)
 static void tcp_client_task(void *pvParameters)
 {
     int err         = 0;
-    char tx_buffer[128] = "Hello, server";
+    char tx_buffer[128] = "";
     char rx_buffer[128] = "";
     char addr_str[128]  = "";
+
+    ((joystick_data_t*)tx_buffer)->x = 0.5f;
+    ((joystick_data_t*)tx_buffer)->y = 0.5f;
 
     struct sockaddr_in dest_addr = { 0 };
 
@@ -158,7 +166,7 @@ static void tcp_client_task(void *pvParameters)
     
     while (1)
     {
-      int len = send(sock, tx_buffer, strlen(tx_buffer), 0);
+      int len = send(sock, tx_buffer, sizeof(joystick_data_t), 0);
 
       if (len < 0)
       {
@@ -168,7 +176,7 @@ static void tcp_client_task(void *pvParameters)
       ESP_LOGI(TAG, "Sent %d bytes: %s", len, tx_buffer);
 
       // Принимаем ответ
-      len = recv(sock, rx_buffer, sizeof(rx_buffer) - 1, 0);
+      len = recv(sock, rx_buffer, sizeof(joystick_data_t), 0);
       if (len < 0)
       {
           ESP_LOGE(TAG, "Error occurred during receiving: errno %d", errno);
@@ -179,7 +187,7 @@ static void tcp_client_task(void *pvParameters)
           ESP_LOGI(TAG, "Received %d bytes: %s", len, rx_buffer);
       }
 
-      vTaskDelay(pdMS_TO_TICKS(20));
+      vTaskDelay(pdMS_TO_TICKS(50));
     }
 
     ESP_LOGI(TAG, "Closed");
